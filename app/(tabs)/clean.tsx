@@ -288,7 +288,7 @@ export default function PorterCleanScreen() {
               </View>
               <Text style={{ fontFamily: FONT.semibold, fontSize: 16, color: c.textPrimary }}>{settings.requireQrCheckIn ? 'Scan a QR code to start cleaning' : 'Start a cleaning session'}</Text>
               <Text style={{ ...TYPE.body, color: c.textSecondary, textAlign: 'center', lineHeight: 20 }}>
-                {selectedBuilding ? `Starting at ${selectedBuilding.buildingName}.` : '{settings.requireQrCheckIn ? 'Scan at the building entrance to create a proof-of-work check-in.' : 'Tap below to check in and start cleaning.'}'}
+                {selectedBuilding ? `Starting at ${selectedBuilding.buildingName}.` : settings.requireQrCheckIn ? 'Scan at the building entrance to create a proof-of-work check-in.' : 'Tap below to check in and start cleaning.'}
               </Text>
 
               <Pressable onPress={() => { if (settings.requireQrCheckIn) { setScanOpen(true); } else { const bid = selectedBuilding?.buildingId ?? schedule[0]?.buildingId; if (bid) { startCleaningSession({ buildingId: bid }); } } }} style={{ width: '100%' }}>
