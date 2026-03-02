@@ -12,9 +12,11 @@ type Props = {
   language?: 'en' | 'es';
 };
 
-function getApiKey() {
-  const k = (process.env.EXPO_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '').trim();
-  return k;
+function getWhisperConfig() {
+  const endpoint = (process.env.EXPO_PUBLIC_WHISPER_ENDPOINT || 'https://api.openai.com').trim().replace(/\/$/, '');
+  const apiKey = (process.env.EXPO_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '').trim();
+  const isLocal = !endpoint.includes('openai.com');
+  return { endpoint, apiKey, isLocal };
 }
 
 export function VoiceInput({ onTranscribe, disabled, language }: Props) {
@@ -73,9 +75,9 @@ export function VoiceInput({ onTranscribe, disabled, language }: Props) {
 
   async function stop() {
     if (!recording || busy) return;
-    const apiKey = getApiKey();
-    if (!apiKey) {
-      Alert.alert('Missing API Key', 'Set EXPO_PUBLIC_OPENAI_API_KEY to enable transcription.');
+    const { endpoint, apiKey, isLocal } = getWhisperConfig();
+    if (!isLocal && !apiKey) {
+      Alert.alert('Missing API Key', 'Set EXPO_PUBLIC_OPENAI_API_KEY or EXPO_PUBLIC_WHISPER_ENDPOINT for local Whisper.');
       return;
     }
 
@@ -87,7 +89,6 @@ export function VoiceInput({ onTranscribe, disabled, language }: Props) {
       if (!uri) throw new Error('Missing recording URI.');
 
       const form = new FormData();
-      form.append('model', 'whisper-1');
       form.append('language', lang);
       (form as any).append('file', {
         uri,
@@ -95,9 +96,19 @@ export function VoiceInput({ onTranscribe, disabled, language }: Props) {
         type: 'audio/m4a',
       });
 
-      const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      // Local Whisper doesn't need model param or auth header
+      if (!isLocal) {
+        form.append('model', 'whisper-1');
+      }
+
+      const headers: Record<string, string> = {};
+      if (!isLocal && apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+
+      const res = await fetch(`${endpoint}/v1/audio/transcriptions`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}` },
+        headers,
         body: form,
       });
 
