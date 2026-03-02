@@ -3,11 +3,13 @@ import type { ViewStyle } from 'react-native';
 
 export type ColorSchemeName = 'light' | 'dark';
 
+const isWeb = Platform.OS === 'web';
+
 export const FONT = {
-  regular: 'Inter_400Regular',
-  medium: 'Inter_500Medium',
-  semibold: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
+  regular: isWeb ? 'Inter, sans-serif' : 'Inter_400Regular',
+  medium: isWeb ? 'Inter, sans-serif' : 'Inter_500Medium',
+  semibold: isWeb ? 'Inter, sans-serif' : 'Inter_600SemiBold',
+  bold: isWeb ? 'Inter, sans-serif' : 'Inter_700Bold',
 } as const;
 
 export const SPACING = {
@@ -27,19 +29,23 @@ export const TYPE = {
   heroNumber: {
     fontSize: 36,
     fontFamily: FONT.bold,
+    ...(isWeb ? { fontWeight: '700' as const } : {}),
     letterSpacing: 0.2,
   },
   sectionHeader: {
     fontSize: 18,
     fontFamily: FONT.semibold,
+    ...(isWeb ? { fontWeight: '600' as const } : {}),
   },
   body: {
     fontSize: 14,
     fontFamily: FONT.regular,
+    ...(isWeb ? { fontWeight: '400' as const } : {}),
   },
   labelCaps: {
     fontSize: 12,
     fontFamily: FONT.medium,
+    ...(isWeb ? { fontWeight: '500' as const } : {}),
     letterSpacing: 0.6,
     textTransform: 'uppercase' as const,
   },
@@ -152,4 +158,3 @@ export const DARK_THEME: AppTheme = {
 export function getTheme(scheme: ColorSchemeName): AppTheme {
   return scheme === 'dark' ? DARK_THEME : LIGHT_THEME;
 }
-
