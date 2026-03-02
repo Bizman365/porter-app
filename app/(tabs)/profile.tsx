@@ -20,6 +20,7 @@ export default function ProfileScreen() {
   const { theme } = useTheme();
   const c = theme.colors;
   const staff = getActiveStaff();
+  const isAdmin = staff.role === 'Super' || staff.role === 'Admin';
   const settings = useSettings();
 
   return (
@@ -35,7 +36,8 @@ export default function ProfileScreen() {
         <Text style={{ fontFamily: FONT.regular, fontSize: 14, color: c.textSecondary, marginTop: 4 }}>{staff.role}</Text>
       </View>
 
-      {/* Settings Section */}
+      {/* Settings Section — Admin Only */}
+      {isAdmin && (<>
       <View style={{ paddingHorizontal: SPACING.screenX, marginBottom: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Settings color={c.textSecondary} size={16} />
@@ -193,9 +195,10 @@ export default function ProfileScreen() {
           />
         </Pressable>
       </View>
+      </>)}
 
-      {/* Rewards Config (when gamification is ON) */}
-      {settings.enableGamification && (
+      {/* Rewards Config (admin only, when gamification is ON) */}
+      {isAdmin && settings.enableGamification && (
         <>
           <View style={{ paddingHorizontal: SPACING.screenX, marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -211,6 +214,14 @@ export default function ProfileScreen() {
               <Text style={{ ...TYPE.labelCaps, color: c.textSecondary }}>Porter View (Preview)</Text>
             </View>
           </View>
+          <RewardsPorter />
+          <View style={{ height: 40 }} />
+        </>
+      )}
+
+      {/* Porter View (non-admin) */}
+      {!isAdmin && settings.enableGamification && (
+        <>
           <RewardsPorter />
           <View style={{ height: 40 }} />
         </>
