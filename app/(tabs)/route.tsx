@@ -9,7 +9,8 @@ import { useTheme } from '../../lib/colorScheme';
 import { formatWeekdayMonthDay } from '../../lib/format';
 import { useTranslation } from '../../lib/i18n';
 import { getActiveStaff, type CleaningScheduleItem } from '../../lib/mockData';
-import { usePorterData } from '../../lib/porterSession';
+import { startCleaningSession, usePorterData } from '../../lib/porterSession';
+import { useSettings } from '../../lib/settings';
 import { FONT, RADII, SPACING, TYPE } from '../../lib/theme';
 
 function scheduleTone(status: 'scheduled' | 'in_progress' | 'completed') {
@@ -92,6 +93,7 @@ export default function PorterRouteScreen() {
   const c = theme.colors;
 
   const { schedule, activeSession } = usePorterData();
+  const settings = useSettings();
 
   const todayLabel = formatWeekdayMonthDay(new Date().toISOString());
   const todayDow = weekdayShort(new Date());
@@ -315,7 +317,7 @@ export default function PorterRouteScreen() {
 
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingTop: 2 }}>
                 <Pressable
-                  onPress={() => router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId, autoScan: '1' } })}
+                  onPress={() => { if (settings.requireQrCheckIn) { router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId, autoScan: '1' } }); } else { startCleaningSession({ buildingId: b.buildingId }); router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId } }); } }}
                   disabled={b.status === 'completed'}
                 >
                   {({ pressed }) => (
