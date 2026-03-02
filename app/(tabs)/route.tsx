@@ -187,7 +187,6 @@ export default function PorterRouteScreen() {
             {todayLabel} · {t('porter.routeSubtitle')}
           </Text>
         </View>
-        <Badge label={t('porter.syncedWithDSNY')} tone="success" />
       </View>
 
       {dsnyAlert ? (
