@@ -274,7 +274,7 @@ export default function PorterRouteScreen() {
           icon={({ color, size }) => <Building2 color={color} size={size} />}
         />
         <StatCard label={t('porter.tasksDone')} value={`${stats.tasksDone}`} icon={({ color, size }) => <CheckCircle2 color={color} size={size} />} />
-        <StatCard label={t('today.points')} value={`${stats.points}`} icon={({ color, size }) => <Trophy color={color} size={size} />} />
+        {settings.enableGamification && <StatCard label={t('today.points')} value={`${stats.points}`} icon={({ color, size }) => <Trophy color={color} size={size} />} />}
       </View>
 
       <View style={{ gap: 12 }}>

@@ -4,12 +4,14 @@ export type LocationMismatchAction = 'allow_with_flag' | 'require_note' | 'block
 
 export type AppSettings = {
   requireQrCheckIn: boolean;
+  enableGamification: boolean;
   geofenceRadiusMeters: number;
   locationMismatchAction: LocationMismatchAction;
 };
 
 let settingsState: AppSettings = {
   requireQrCheckIn: true,
+  enableGamification: true,
   geofenceRadiusMeters: 150,
   locationMismatchAction: 'require_note',
 };

@@ -1,4 +1,4 @@
-import { MapPin, QrCode, Settings, ShieldAlert } from 'lucide-react-native';
+import { MapPin, QrCode, Settings, ShieldAlert, Trophy } from 'lucide-react-native';
 import { Platform, Pressable, Switch, Text, View } from 'react-native';
 
 import { Screen } from '../../components/Screen';
@@ -159,6 +159,37 @@ export default function ProfileScreen() {
             </View>
           </View>
         )}
+      </View>
+
+      {/* Gamification Section */}
+      <View style={{ paddingHorizontal: SPACING.screenX, marginBottom: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Trophy color={c.textSecondary} size={16} />
+          <Text style={{ ...TYPE.labelCaps, color: c.textSecondary }}>Gamification</Text>
+        </View>
+      </View>
+
+      <View style={{ marginHorizontal: SPACING.screenX, backgroundColor: c.card, borderRadius: RADII.card, overflow: 'hidden', marginBottom: SPACING.sectionGap }}>
+        <Pressable
+          onPress={() => updateSettings({ enableGamification: !settings.enableGamification })}
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, marginRight: 16 }}>
+            <Trophy color={settings.enableGamification ? c.primary : c.textMuted} size={20} />
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: FONT.semibold, fontSize: 15, color: c.textPrimary }}>Enable Points & Rewards</Text>
+              <Text style={{ fontFamily: FONT.regular, fontSize: 13, color: c.textMuted, marginTop: 2 }}>
+                {settings.enableGamification ? 'Porters earn points for completed tasks and buildings.' : 'Points and gamification features are hidden.'}
+              </Text>
+            </View>
+          </View>
+          <Switch
+            value={settings.enableGamification}
+            onValueChange={(v) => updateSettings({ enableGamification: v })}
+            trackColor={{ false: 'rgba(255,255,255,0.1)', true: c.primary }}
+            thumbColor={Platform.OS === 'android' ? '#FFFFFF' : undefined}
+          />
+        </Pressable>
       </View>
     </Screen>
   );
