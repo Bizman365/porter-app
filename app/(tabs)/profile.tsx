@@ -2,6 +2,7 @@ import { MapPin, QrCode, Settings, ShieldAlert, Trophy } from 'lucide-react-nati
 import { Platform, Pressable, Switch, Text, View } from 'react-native';
 
 import { Screen } from '../../components/Screen';
+import { PhoneVerification } from '../../components/PhoneVerification';
 import { RewardsAdmin } from '../../components/RewardsAdmin';
 import { RewardsPorter } from '../../components/RewardsPorter';
 import { useTheme } from '../../lib/colorScheme';
@@ -34,6 +35,14 @@ export default function ProfileScreen() {
       <View style={{ marginHorizontal: SPACING.screenX, backgroundColor: c.card, borderRadius: RADII.card, padding: 20, marginBottom: SPACING.sectionGap }}>
         <Text style={{ fontFamily: FONT.bold, fontSize: 20, color: c.textPrimary }}>{staff.name}</Text>
         <Text style={{ fontFamily: FONT.regular, fontSize: 14, color: c.textSecondary, marginTop: 4 }}>{staff.role}</Text>
+      </View>
+
+      {/* Contact Number */}
+      <View style={{ paddingHorizontal: SPACING.screenX, marginBottom: 12 }}>
+        <PhoneVerification
+          currentPhone={staff.phone || ''}
+          onPhoneVerified={(phone) => { /* In production: API call to update */ }}
+        />
       </View>
 
       {/* Settings Section — Admin Only */}

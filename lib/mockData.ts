@@ -71,6 +71,7 @@ export type MockStaff = {
   name: string;
   role: StaffRole;
   buildings: string[];
+  phone?: string;
 };
 
 export type JobPriority = 'Emergency' | 'Urgent' | 'Routine';
@@ -109,6 +110,7 @@ export type Achievement = {
 export const mockStaff: MockStaff = {
   id: 'staff_001',
   name: 'Marcus Johnson',
+  phone: '+1 (212) 555-0198',
   role: 'Super',
   buildings: ['121 West 18th St', '350 East 62nd St'],
 };
@@ -116,6 +118,7 @@ export const mockStaff: MockStaff = {
 export const mockPorterStaff: MockStaff = {
   id: 'staff_002',
   name: 'Diego Rivera',
+  phone: '+1 (929) 555-0147',
   role: 'Porter',
   buildings: ['121 West 18th St', '350 East 62nd St'],
 };
