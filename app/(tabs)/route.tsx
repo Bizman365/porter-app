@@ -315,7 +315,7 @@ export default function PorterRouteScreen() {
 
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingTop: 2 }}>
                 <Pressable
-                  onPress={() => router.push({ pathname: '/(tabs)/porter-clean', params: { buildingId: b.buildingId, autoScan: '1' } })}
+                  onPress={() => router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId, autoScan: '1' } })}
                   disabled={b.status === 'completed'}
                 >
                   {({ pressed }) => (
