@@ -21,6 +21,7 @@ import {
   usePorterData,
 } from '../../lib/porterSession';
 import { FONT, RADII, SPACING, TYPE } from '../../lib/theme';
+import { useSettings } from '../../lib/settings';
 
 function titleCaseArea(area: CleaningArea) {
   return area
@@ -156,6 +157,7 @@ export default function PorterCleanScreen() {
   const params = useLocalSearchParams<{ buildingId?: string; autoScan?: string }>();
 
   const { schedule, activeSession, logs } = usePorterData();
+  const settings = useSettings();
   const [scanOpen, setScanOpen] = useState(false);
   const [scanned, setScanned] = useState(false);
 
@@ -251,7 +253,7 @@ export default function PorterCleanScreen() {
       <View style={{ gap: 6 }}>
         <Text style={{ fontFamily: FONT.bold, fontSize: 26, color: c.textPrimary }}>Clean</Text>
         <Text style={{ ...TYPE.body, color: c.textSecondary }}>
-          {formatWeekdayMonthDay(new Date().toISOString())} · QR check-ins + timestamped evidence photos
+          {formatWeekdayMonthDay(new Date().toISOString())} · {settings.requireQrCheckIn ? 'QR check-ins + timestamped evidence photos' : 'Timestamped evidence photos'}
         </Text>
       </View>
 
@@ -284,12 +286,12 @@ export default function PorterCleanScreen() {
               >
                 <Sparkles color={c.primary} size={28} />
               </View>
-              <Text style={{ fontFamily: FONT.semibold, fontSize: 16, color: c.textPrimary }}>Scan a QR code to start cleaning</Text>
+              <Text style={{ fontFamily: FONT.semibold, fontSize: 16, color: c.textPrimary }}>{settings.requireQrCheckIn ? 'Scan a QR code to start cleaning' : 'Start a cleaning session'}</Text>
               <Text style={{ ...TYPE.body, color: c.textSecondary, textAlign: 'center', lineHeight: 20 }}>
-                {selectedBuilding ? `Starting at ${selectedBuilding.buildingName}.` : 'Scan at the building entrance to create a proof-of-work check-in.'}
+                {selectedBuilding ? `Starting at ${selectedBuilding.buildingName}.` : '{settings.requireQrCheckIn ? 'Scan at the building entrance to create a proof-of-work check-in.' : 'Tap below to check in and start cleaning.'}'}
               </Text>
 
-              <Pressable onPress={() => setScanOpen(true)} style={{ width: '100%' }}>
+              <Pressable onPress={() => { if (settings.requireQrCheckIn) { setScanOpen(true); } else { const bid = selectedBuilding?.buildingId ?? schedule[0]?.buildingId; if (bid) { startCleaningSession({ buildingId: bid }); } } }} style={{ width: '100%' }}>
                 {({ pressed }) => (
                   <View
                     style={{
@@ -303,8 +305,8 @@ export default function PorterCleanScreen() {
                       gap: 10,
                     }}
                   >
-                    <ScanLine color="#FFFFFF" size={18} />
-                    <Text style={{ fontFamily: FONT.semibold, fontSize: 14, color: '#FFFFFF' }}>Scan QR</Text>
+                    {settings.requireQrCheckIn && <ScanLine color="#FFFFFF" size={18} />}
+                    <Text style={{ fontFamily: FONT.semibold, fontSize: 14, color: '#FFFFFF' }}>{settings.requireQrCheckIn ? 'Scan QR' : 'Start Cleaning'}</Text>
                   </View>
                 )}
               </Pressable>
