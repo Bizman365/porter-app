@@ -379,6 +379,8 @@ export type CleaningScheduleItem = {
   buildingId: string;
   buildingName: string;
   address: string;
+  latitude: number;
+  longitude: number;
   areas: CleaningArea[];
   dsnySchedule: DSNYSchedule;
   cleaningTasks: CleaningTask[];
@@ -426,6 +428,7 @@ export const mockCleaningSchedule: CleaningScheduleItem[] = [
     buildingId: 'bldg_andrews_1705',
     buildingName: '1705 Andrews Ave S',
     address: '1705 Andrews Ave, Bronx, NY',
+    latitude: 40.8537, longitude: -73.9013,
     areas: ['lobby', 'stairs', 'hallway', 'trash_room', 'elevator'],
     dsnySchedule: { trash: ['Tue', 'Thu', 'Sat'], recycling: ['Sat'], compost: ['Sat'], setOutTime: '8:00 PM', district: '205' },
     cleaningTasks: defaultCleaningTasks({ hasCommonBathroom: false }),
@@ -436,6 +439,7 @@ export const mockCleaningSchedule: CleaningScheduleItem[] = [
     buildingId: 'bldg_park_1939',
     buildingName: '1939 Park Pl',
     address: '1939 Park Pl, Brooklyn, NY',
+    latitude: 40.6735, longitude: -73.9287,
     areas: ['lobby', 'hallway', 'laundry_room', 'common_bathroom'],
     dsnySchedule: { trash: ['Tue', 'Thu', 'Sat'], recycling: ['Thu'], compost: ['Thu'], setOutTime: '8:00 PM', district: '316' },
     cleaningTasks: defaultCleaningTasks({ hasCommonBathroom: true }),
@@ -446,6 +450,7 @@ export const mockCleaningSchedule: CleaningScheduleItem[] = [
     buildingId: 'bldg_115th_83',
     buildingName: '83 W 115th St',
     address: '83 W 115th St, New York, NY',
+    latitude: 40.7992, longitude: -73.9526,
     areas: ['lobby', 'stairs', 'hallway', 'exterior'],
     dsnySchedule: { trash: ['Tue', 'Thu', 'Sat'], recycling: ['Thu'], compost: ['Thu'], setOutTime: '8:00 PM', district: '110' },
     cleaningTasks: defaultCleaningTasks({ hasCommonBathroom: false }),
@@ -456,6 +461,7 @@ export const mockCleaningSchedule: CleaningScheduleItem[] = [
     buildingId: 'bldg_southern_1355',
     buildingName: '1355 Southern Blvd',
     address: '1355 Southern Blvd, Bronx, NY',
+    latitude: 40.8282, longitude: -73.8932,
     areas: ['lobby', 'elevator', 'courtyard', 'trash_room'],
     dsnySchedule: { trash: ['Mon', 'Wed', 'Fri'], recycling: ['Wed'], compost: ['Wed'], setOutTime: '8:00 PM', district: '203' },
     cleaningTasks: defaultCleaningTasks({ hasCommonBathroom: false }),
@@ -466,6 +472,7 @@ export const mockCleaningSchedule: CleaningScheduleItem[] = [
     buildingId: 'bldg_halsey_22',
     buildingName: '22 Halsey St',
     address: '22 Halsey St, Brooklyn, NY',
+    latitude: 40.6865, longitude: -73.9547,
     areas: ['basement', 'trash_room', 'stairs', 'roof'],
     dsnySchedule: { trash: ['Tue', 'Thu', 'Sat'], recycling: ['Tue'], compost: ['Tue'], setOutTime: '8:00 PM', district: '303' },
     cleaningTasks: defaultCleaningTasks({ hasCommonBathroom: false }),

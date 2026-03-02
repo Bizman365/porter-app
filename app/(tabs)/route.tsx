@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Building2, CheckCircle2, MapPin, Trophy } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, TextInput, Modal, View } from 'react-native';
 
 import { Screen } from '../../components/Screen';
 import { Badge } from '../../components/ui/Badge';
@@ -11,6 +11,8 @@ import { useTranslation } from '../../lib/i18n';
 import { getActiveStaff, type CleaningScheduleItem } from '../../lib/mockData';
 import { startCleaningSession, usePorterData } from '../../lib/porterSession';
 import { useSettings } from '../../lib/settings';
+import { getCurrentLocation, distanceMeters, DEFAULT_GEOFENCE_RADIUS } from '../../lib/geolocation';
+import { getSettings } from '../../lib/settings';
 import { FONT, RADII, SPACING, TYPE } from '../../lib/theme';
 
 function scheduleTone(status: 'scheduled' | 'in_progress' | 'completed') {
@@ -94,6 +96,63 @@ export default function PorterRouteScreen() {
 
   const { schedule, activeSession } = usePorterData();
   const settings = useSettings();
+  const [geoModalVisible, setGeoModalVisible] = useState(false);
+  const [geoModalBuilding, setGeoModalBuilding] = useState<string | null>(null);
+  const [geoNote, setGeoNote] = useState('');
+  const [geoDistance, setGeoDistance] = useState<number | null>(null);
+  const [checkingIn, setCheckingIn] = useState(false);
+
+  async function handleCheckIn(b: CleaningScheduleItem) {
+    if (settings.requireQrCheckIn) {
+      router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId, autoScan: '1' } });
+      return;
+    }
+
+    setCheckingIn(true);
+    const loc = await getCurrentLocation();
+    setCheckingIn(false);
+
+    if (!loc.ok) {
+      Alert.alert('Location Error', loc.message);
+      return;
+    }
+
+    const dist = distanceMeters(loc.latitude, loc.longitude, b.latitude, b.longitude);
+    const radius = settings.geofenceRadiusMeters;
+
+    if (dist <= radius) {
+      // Within geofence — proceed
+      startCleaningSession({ buildingId: b.buildingId });
+      router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId } });
+      return;
+    }
+
+    // Outside geofence
+    const action = settings.locationMismatchAction;
+    if (action === 'block') {
+      Alert.alert(
+        'Too Far Away',
+        `You are ${Math.round(dist)}m from ${b.buildingName}. Check-in is only allowed within ${radius}m.`,
+      );
+      return;
+    }
+
+    if (action === 'allow_with_flag') {
+      startCleaningSession({ buildingId: b.buildingId });
+      Alert.alert(
+        '⚠️ Location Flagged',
+        `You are ${Math.round(dist)}m away. This session has been flagged for review.`,
+        [{ text: 'OK', onPress: () => router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId } }) }],
+      );
+      return;
+    }
+
+    // require_note
+    setGeoDistance(Math.round(dist));
+    setGeoModalBuilding(b.buildingId);
+    setGeoNote('');
+    setGeoModalVisible(true);
+  }
 
   const todayLabel = formatWeekdayMonthDay(new Date().toISOString());
   const todayDow = weekdayShort(new Date());
@@ -317,7 +376,7 @@ export default function PorterRouteScreen() {
 
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingTop: 2 }}>
                 <Pressable
-                  onPress={() => { if (settings.requireQrCheckIn) { router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId, autoScan: '1' } }); } else { startCleaningSession({ buildingId: b.buildingId }); router.push({ pathname: '/(tabs)/clean', params: { buildingId: b.buildingId } }); } }}
+                  onPress={() => handleCheckIn(b)}
                   disabled={b.status === 'completed'}
                 >
                   {({ pressed }) => (
@@ -345,6 +404,60 @@ export default function PorterRouteScreen() {
           );
         })}
       </View>
+
+      {/* Location Mismatch Modal */}
+      <Modal visible={geoModalVisible} transparent animationType="fade" onRequestClose={() => setGeoModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', paddingHorizontal: 24 }}>
+          <View style={{ backgroundColor: c.card, borderRadius: RADII.card, padding: 20, gap: 16 }}>
+            <Text style={{ fontFamily: FONT.bold, fontSize: 18, color: c.textPrimary }}>⚠️ Wrong Location</Text>
+            <Text style={{ fontFamily: FONT.regular, fontSize: 14, color: c.textSecondary, lineHeight: 20 }}>
+              You are {geoDistance}m away from the building. Please explain why you are checking in from this location.
+            </Text>
+            <TextInput
+              value={geoNote}
+              onChangeText={setGeoNote}
+              placeholder="e.g. GPS inaccurate, building next door..."
+              placeholderTextColor={c.textMuted}
+              multiline
+              style={{
+                fontFamily: FONT.regular,
+                fontSize: 14,
+                color: c.textPrimary,
+                backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#F3F4F6',
+                borderRadius: RADII.button,
+                padding: 12,
+                minHeight: 80,
+                textAlignVertical: 'top',
+              }}
+            />
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable onPress={() => setGeoModalVisible(false)} style={{ flex: 1 }}>
+                {({ pressed }) => (
+                  <View style={{ paddingVertical: 12, alignItems: 'center', borderRadius: RADII.button, borderWidth: 1, borderColor: c.border, opacity: pressed ? 0.8 : 1 }}>
+                    <Text style={{ fontFamily: FONT.semibold, fontSize: 14, color: c.textSecondary }}>Cancel</Text>
+                  </View>
+                )}
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  if (!geoNote.trim()) { Alert.alert('Required', 'Please enter a reason.'); return; }
+                  if (geoModalBuilding) { startCleaningSession({ buildingId: geoModalBuilding }); }
+                  setGeoModalVisible(false);
+                  if (geoModalBuilding) { router.push({ pathname: '/(tabs)/clean', params: { buildingId: geoModalBuilding } }); }
+                }}
+                style={{ flex: 1 }}
+              >
+                {({ pressed }) => (
+                  <View style={{ paddingVertical: 12, alignItems: 'center', borderRadius: RADII.button, backgroundColor: c.warning, opacity: pressed ? 0.8 : 1 }}>
+                    <Text style={{ fontFamily: FONT.semibold, fontSize: 14, color: '#FFFFFF' }}>Check In Anyway</Text>
+                  </View>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </Screen>
   );
 }
