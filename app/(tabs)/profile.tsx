@@ -2,6 +2,8 @@ import { MapPin, QrCode, Settings, ShieldAlert, Trophy } from 'lucide-react-nati
 import { Platform, Pressable, Switch, Text, View } from 'react-native';
 
 import { Screen } from '../../components/Screen';
+import { RewardsAdmin } from '../../components/RewardsAdmin';
+import { RewardsPorter } from '../../components/RewardsPorter';
 import { useTheme } from '../../lib/colorScheme';
 import { getActiveStaff } from '../../lib/mockData';
 import {
@@ -191,6 +193,28 @@ export default function ProfileScreen() {
           />
         </Pressable>
       </View>
+
+      {/* Rewards Config (when gamification is ON) */}
+      {settings.enableGamification && (
+        <>
+          <View style={{ paddingHorizontal: SPACING.screenX, marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Trophy color={c.primary} size={16} />
+              <Text style={{ ...TYPE.labelCaps, color: c.textSecondary }}>Rewards Configuration</Text>
+            </View>
+          </View>
+          <RewardsAdmin />
+          <View style={{ height: SPACING.sectionGap }} />
+          <View style={{ paddingHorizontal: SPACING.screenX, marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Trophy color={c.primary} size={16} />
+              <Text style={{ ...TYPE.labelCaps, color: c.textSecondary }}>Porter View (Preview)</Text>
+            </View>
+          </View>
+          <RewardsPorter />
+          <View style={{ height: 40 }} />
+        </>
+      )}
     </Screen>
   );
 }
