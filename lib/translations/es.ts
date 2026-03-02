@@ -292,7 +292,7 @@ export const es = {
     scannerPro: { title: 'Escáner Pro', desc: '20 escaneos QR' },
   },
   porter: {
-    routeSubtitle: 'Ruta y horario DSNY',
+    routeSubtitle: 'Horario de ruta',
     buildingsToday: 'Edificios hoy',
     tasksDone: 'Tareas hechas',
     trashPickupToday: 'Recolección de basura hoy',

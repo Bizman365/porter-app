@@ -292,7 +292,7 @@ export const en = {
     scannerPro: { title: 'Scanner Pro', desc: '20 QR check-ins' },
   },
   porter: {
-    routeSubtitle: 'Route & DSNY schedule',
+    routeSubtitle: 'Route schedule',
     buildingsToday: 'Buildings Today',
     tasksDone: 'Tasks Done',
     trashPickupToday: 'Trash pickup today',
